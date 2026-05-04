@@ -1,7 +1,7 @@
 {
-  "name": "Radio Fusion Austral",
-  "short_name": "Fusion Austral",
-  "description": "Desde la Patagonia al Mundo",
+  "name": "Radio Horcon",
+  "short_name": "Radio Horcon",
+  "description": "Radio Online de la comuna de Horcon, Chile. Música, noticias y entretenimiento para toda la comunidad.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
