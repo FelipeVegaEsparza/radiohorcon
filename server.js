@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
+const https = require('https');
 const compression = require('compression');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -25,23 +27,18 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// CORS - Restringido a orígenes específicos
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
-  ? process.env.ALLOWED_ORIGINS.split(',') 
-  : ['http://localhost:3000', 'http://localhost:8080'];
-
+// CORS - Permitir todos los orígenes en producción para archivos estáticos
 const corsOptions = {
   origin: function (origin, callback) {
     // Permitir requests sin origin (como mobile apps, curl, service workers)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
+    
+    // En producción, permitir cualquier origen para archivos estáticos
+    // El navegador envía el origin del dominio actual
+    callback(null, true);
   },
-  methods: ['GET', 'HEAD'],
-  allowedHeaders: ['Content-Type'],
+  methods: ['GET', 'HEAD', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: false
 };
 app.use(cors(corsOptions));
@@ -152,8 +149,6 @@ app.use((req, res, next) => {
 });
 
 // Leer configuración al inicio
-const fs = require('fs');
-const https = require('https');
 let currentTemplate = 'minimalista';
 let clientId = null;
 let ipstreamBaseUrl = null;
