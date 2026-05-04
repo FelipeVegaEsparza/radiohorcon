@@ -11,12 +11,17 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const IS_PRODUCTION = NODE_ENV === 'production';
 
 // Rate Limiting - Protección contra DoS y scraping
+// Excluir archivos estáticos del rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: IS_PRODUCTION ? 100 : 1000, // 100 requests por IP en producción, 1000 en dev
+  max: IS_PRODUCTION ? 1000 : 10000, // 1000 requests por IP en producción, 10000 en dev
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Too many requests, please try again later.' }
+  message: { error: 'Too many requests, please try again later.' },
+  skip: (req) => {
+    // No aplicar rate limiting a archivos estáticos
+    return req.url.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|mp3|mp4|webm|json)$/);
+  }
 });
 app.use(limiter);
 
@@ -80,6 +85,7 @@ const cspDirectives = {
     "https://cdn.onesignal.com",
     "https://cdnjs.cloudflare.com",
     "https://fonts.googleapis.com",
+    "https://fonts.gstatic.com",
     "https://cdn.jsdelivr.net",
     "https://unpkg.com"
   ],
@@ -129,6 +135,21 @@ app.use(helmet({
 
 // Compresión gzip
 app.use(compression());
+
+// Middleware para servir archivos estáticos con headers correctos
+app.use((req, res, next) => {
+  // Agregar headers de seguridad para archivos estáticos
+  if (req.url.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    
+    // Asegurar que los archivos JS tengan el Content-Type correcto
+    if (req.url.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    }
+  }
+  next();
+});
 
 // Leer configuración al inicio
 const fs = require('fs');
@@ -385,7 +406,12 @@ app.get('/assets/*', (req, res, next) => {
     const allowedTemplatePath = path.resolve(__dirname, 'templates', currentTemplate, 'assets');
     
     if (resolvedTemplatePath.startsWith(allowedTemplatePath) && fs.existsSync(templateAssetPath)) {
-      return res.sendFile(templateAssetPath);
+      return res.sendFile(templateAssetPath, (err) => {
+        if (err) {
+          console.error('Error serving template asset:', err);
+          next(err);
+        }
+      });
     }
   }
   
@@ -395,9 +421,15 @@ app.get('/assets/*', (req, res, next) => {
   const allowedRootPath = path.resolve(__dirname, 'assets');
   
   if (resolvedRootPath.startsWith(allowedRootPath) && fs.existsSync(rootAssetPath)) {
-    return res.sendFile(rootAssetPath);
+    return res.sendFile(rootAssetPath, (err) => {
+      if (err) {
+        console.error('Error serving root asset:', err);
+        next(err);
+      }
+    });
   }
   
+  // Si no se encuentra el archivo, continuar al siguiente middleware
   next();
 });
 
@@ -411,21 +443,42 @@ app.use(express.static('.', {
   maxAge: '1d',
   etag: true,
   index: false,
-  dotfiles: 'deny' // No servir archivos ocultos
+  dotfiles: 'deny', // No servir archivos ocultos
+  fallthrough: true // Continuar al siguiente middleware si el archivo no existe
 }));
+
+// Middleware adicional para logging de archivos no encontrados
+app.use((req, res, next) => {
+  if (req.url.startsWith('/assets/') || req.url.startsWith('/templates/')) {
+    console.warn(`File not found: ${req.url}`);
+  }
+  next();
+});
 
 // Manejo de errores 404
 app.use((req, res) => {
+  console.warn(`404 Not Found: ${req.url}`);
   res.status(404).sendFile(path.join(__dirname, 'offline.html'));
 });
 
 // Manejo de errores del servidor
 app.use((err, req, res, next) => {
   console.error('Server Error:', err.message);
+  console.error('Stack:', err.stack);
+  console.error('URL:', req.url);
+  console.error('Method:', req.method);
+  
   if (IS_PRODUCTION) {
-    res.status(500).send('Internal server error');
+    res.status(500).json({ 
+      error: 'Internal server error',
+      path: req.url 
+    });
   } else {
-    res.status(500).send(`Error: ${err.message}`);
+    res.status(500).json({
+      error: err.message,
+      stack: err.stack,
+      path: req.url
+    });
   }
 });
 

@@ -6,8 +6,6 @@ const CACHEABLE_DOMAINS = [
   self.location.origin,
   'dashboard.ipstream.cl',
   'stream.ipstream.cl',
-  'fonts.googleapis.com',
-  'fonts.gstatic.com',
   'cdnjs.cloudflare.com'
 ];
 
