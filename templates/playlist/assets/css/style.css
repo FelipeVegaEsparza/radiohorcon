@@ -421,6 +421,7 @@ body {
   color: #d1d1d1;
   max-width: 800px;
   margin: 0 auto;
+  text-align: justify;
 }
 
 .track-list {

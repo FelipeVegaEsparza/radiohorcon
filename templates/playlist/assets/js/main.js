@@ -98,7 +98,7 @@ class RadioStreamApp {
       await Promise.all([
         this.loadPrograms(),
         this.loadNews(),
-        this.loadVideos(),
+
         this.loadPodcasts(),
         this.loadVideocasts(),
         this.loadSponsors(),
@@ -474,100 +474,6 @@ class RadioStreamApp {
     }
   }
 
-  loadVideoThumbnails(videos) {
-    videos.forEach((video, index) => {
-      if (video.videoUrl) {
-        const thumbnail = this.getVideoThumbnail(video.videoUrl);
-        if (thumbnail) {
-          // Update podium thumbnails
-          const podiumThumbnail = document.getElementById(`podium-thumbnail-${index}`);
-          if (podiumThumbnail) {
-            podiumThumbnail.style.backgroundImage = `url(${thumbnail})`;
-            podiumThumbnail.style.backgroundSize = 'cover';
-            podiumThumbnail.style.backgroundPosition = 'center';
-          }
-          
-          // Update ranking thumbnails
-          const rankingThumbnail = document.getElementById(`ranking-thumbnail-${index}`);
-          if (rankingThumbnail) {
-            rankingThumbnail.style.backgroundImage = `url(${thumbnail})`;
-            rankingThumbnail.style.backgroundSize = 'cover';
-            rankingThumbnail.style.backgroundPosition = 'center';
-          }
-        }
-      }
-    });
-  }
-
-  getVideoThumbnail(videoUrl) {
-    if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-      const videoId = this.extractYouTubeId(videoUrl);
-      return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
-    }
-    return null;
-  }
-
-  openVideoModal(index) {
-    if (!this.videosData || !this.videosData[index]) {
-      console.error('Video data not found for index:', index);
-      return;
-    }
-
-    const video = this.videosData[index];
-    const modal = document.getElementById('video-modal');
-    
-    if (!modal) {
-      console.error('Video modal not found');
-      return;
-    }
-
-    // Update modal content
-    document.getElementById('video-modal-title').textContent = video.name;
-    document.getElementById('video-modal-rank').textContent = `#${video.order || index + 1}`;
-    document.getElementById('video-modal-description').textContent = video.description || 'Sin descripción disponible';
-
-    // Setup video player
-    const videoContainer = document.getElementById('video-container');
-    if (video.videoUrl) {
-      // Check if it's a YouTube URL
-      if (video.videoUrl.includes('youtube.com') || video.videoUrl.includes('youtu.be')) {
-        const videoId = this.extractYouTubeId(video.videoUrl);
-        videoContainer.innerHTML = `
-          <iframe width="100%" height="500" 
-                  src="https://www.youtube.com/embed/${videoId}" 
-                  frameborder="0" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                  allowfullscreen>
-          </iframe>
-        `;
-      } else {
-        // For other video URLs, use video element
-        videoContainer.innerHTML = `
-          <video controls style="width: 100%; height: 500px; border-radius: 8px;">
-            <source src="${video.videoUrl}" type="video/mp4">
-            Tu navegador no soporta el elemento video.
-          </video>
-        `;
-      }
-    } else {
-      videoContainer.innerHTML = '<p>No hay video disponible</p>';
-    }
-
-    // Show modal
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-
-  closeVideoModal() {
-    const modal = document.getElementById('video-modal');
-    if (modal) {
-      modal.classList.remove('active');
-      document.body.style.overflow = '';
-      // Clear video container to stop playback
-      document.getElementById('video-container').innerHTML = '';
-    }
-  }
-
   openAnuncioModal(index) {
     if (!this.promotionsData || !this.promotionsData[index]) {
       console.error('Anuncio data not found for index:', index);
@@ -629,9 +535,6 @@ class RadioStreamApp {
       if (e.target.classList.contains('videocast-modal')) {
         this.closeVideocastModal();
       }
-      if (e.target.classList.contains('video-modal')) {
-        this.closeVideoModal();
-      }
       if (e.target.classList.contains('anuncio-modal')) {
         this.closeAnuncioModal();
       }
@@ -643,110 +546,9 @@ class RadioStreamApp {
         this.closeNewsModal();
         this.closePodcastModal();
         this.closeVideocastModal();
-        this.closeVideoModal();
         this.closeAnuncioModal();
       }
     });
-  }
-
-  async loadVideos() {
-    try {
-      const videos = await getVideos();
-      const container = document.getElementById('video-ranking');
-      
-      if (videos && videos.length > 0) {
-        // Store videos data for modal
-        this.videosData = videos;
-        
-        // Separate top 3 and rest
-        const topThree = videos.slice(0, 3);
-        const restVideos = videos.slice(3);
-        
-        const html = `
-          <div class="ranking-container">
-            <!-- Top 3 Podium -->
-            <div class="ranking-podium">
-              ${topThree.map((video, index) => {
-                const position = video.order || index + 1;
-                const podiumClass = position === 1 ? 'first' : position === 2 ? 'second' : 'third';
-                const crownClass = position === 1 ? 'gold' : position === 2 ? 'silver' : 'bronze';
-                return `
-                  <div class="podium-item ${podiumClass}" onclick="streamApp.openVideoModal(${index})">
-                    <div class="podium-rank">
-                      <div class="rank-number">${position}</div>
-                      <div class="rank-crown ${crownClass}">
-                        <i class="fas fa-crown"></i>
-                      </div>
-                    </div>
-                    <div class="podium-thumbnail" id="podium-thumbnail-${index}">
-                      <div class="podium-overlay">
-                        <div class="podium-play-btn">
-                          <i class="fas fa-play"></i>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="podium-info">
-                      <h3>${video.name}</h3>
-                      <div class="podium-stats">
-                        <span><i class="fas fa-trophy"></i> Top ${position}</span>
-                      </div>
-                    </div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-            
-            <!-- Rest of Rankings -->
-            ${restVideos.length > 0 ? `
-              <div class="ranking-list">
-                <h3 class="ranking-list-title">
-                  <i class="fas fa-list-ol"></i>
-                  Resto del Ranking
-                </h3>
-                <div class="ranking-items">
-                  ${restVideos.map((video, index) => {
-                    const globalIndex = index + 3;
-                    const position = video.order || globalIndex + 1;
-                    return `
-                      <div class="ranking-item" onclick="streamApp.openVideoModal(${globalIndex})">
-                        <div class="ranking-position">
-                          <span class="position-number">${position}</span>
-                        </div>
-                        <div class="ranking-thumbnail" id="ranking-thumbnail-${globalIndex}">
-                          <div class="ranking-overlay">
-                            <i class="fas fa-play"></i>
-                          </div>
-                        </div>
-                        <div class="ranking-details">
-                          <h4>${video.name}</h4>
-                          <p>${video.description || 'Sin descripción disponible'}</p>
-                        </div>
-                        <div class="ranking-action">
-                          <button class="ranking-play-btn">
-                            <i class="fas fa-play"></i>
-                          </button>
-                        </div>
-                      </div>
-                    `;
-                  }).join('')}
-                </div>
-              </div>
-            ` : ''}
-          </div>
-        `;
-        
-        container.innerHTML = html;
-        
-        // Load thumbnails after DOM is ready
-        this.loadVideoThumbnails(videos);
-        
-      } else {
-        container.innerHTML = '<div class="loading-content"><p>No hay videos disponibles</p></div>';
-      }
-    } catch (error) {
-      console.error('Error loading videos:', error);
-      document.getElementById('video-ranking').innerHTML = '<div class="loading-content"><p>Error cargando videos</p></div>';
-    }
   }
 
   async loadPodcasts() {
@@ -1186,9 +988,6 @@ class RadioStreamApp {
           break;
         case 'news':
           await this.loadNews();
-          break;
-        case 'videos':
-          await this.loadVideos();
           break;
         case 'podcasts':
           await this.loadPodcasts();
