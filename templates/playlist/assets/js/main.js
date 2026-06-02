@@ -960,7 +960,6 @@ class RadioStreamApp {
       const songData = await getCurrentSong();
       this.currentSongData = songData;
       this.updateNowPlaying(songData);
-      this.updateRecentTracks(songData.history);
     } catch (error) {
       console.error('Error loading SonicPanel data:', error);
       this.updateNowPlaying({
@@ -1032,30 +1031,6 @@ class RadioStreamApp {
     });
   }
 
-  updateRecentTracks(history) {
-    const container = document.getElementById('recent-tracks');
-    
-    if (!history || history.length === 0) {
-      container.innerHTML = '<div class="loading-tracks"><p>No hay historial disponible</p></div>';
-      return;
-    }
-    
-    const html = history.slice(0, 10).map((track, index) => `
-      <div class="track-item">
-        <div class="track-number">${index + 1}</div>
-        <div class="track-artwork">
-          <i class="fas fa-music"></i>
-        </div>
-        <div class="track-info">
-          <div class="track-title">${track}</div>
-          <div class="track-time">Hace ${index + 1} canción${index > 0 ? 'es' : ''}</div>
-        </div>
-      </div>
-    `).join('');
-    
-    container.innerHTML = html;
-  }
-
   startSonicPanelUpdates() {
     // Update every 30 seconds
     this.sonicPanelInterval = setInterval(async () => {
@@ -1065,7 +1040,6 @@ class RadioStreamApp {
         if (!this.currentSongData || this.currentSongData.title !== songData.title) {
           this.currentSongData = songData;
           this.updateNowPlaying(songData);
-          this.updateRecentTracks(songData.history);
         } else {
           // Just update listener count
           document.getElementById('main-listeners').innerHTML = `<i class="fas fa-users"></i> ${songData.listeners} oyentes`;
