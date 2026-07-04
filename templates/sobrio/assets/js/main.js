@@ -576,11 +576,11 @@ class RadioLanding {
         this.updateVideocastsPagination(videocasts.pagination);
         
       } else {
-        container.innerHTML = '<p>No hay videocasts disponibles</p>';
+        container.innerHTML = '<p>No hay videos disponibles</p>';
       }
     } catch (error) {
       console.error('Error loading videocasts:', error);
-      container.innerHTML = '<p>Error cargando videocasts</p>';
+      container.innerHTML = '<p>Error cargando videos</p>';
     }
   }
 
@@ -612,11 +612,11 @@ class RadioLanding {
         
         container.innerHTML = html;
       } else {
-        container.innerHTML = '<p>No hay patrocinadores disponibles</p>';
+        container.innerHTML = '<p>No hay colaboradores disponibles</p>';
       }
     } catch (error) {
       console.error('Error loading sponsors:', error);
-      document.getElementById('sponsors-grid').innerHTML = '<p>Error cargando patrocinadores</p>';
+      document.getElementById('sponsors-grid').innerHTML = '<p>Error cargando colaboradores</p>';
     }
   }
 
@@ -1475,7 +1475,7 @@ class RadioLanding {
 
   openVideocastModal(videocastIndex) {
     if (!this.currentVideocastsData || !this.currentVideocastsData[videocastIndex]) {
-      this.showToast('Error cargando el videocast', 'error');
+      this.showToast('Error cargando el video', 'error');
       return;
     }
     

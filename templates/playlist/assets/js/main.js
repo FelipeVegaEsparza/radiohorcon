@@ -629,7 +629,7 @@ class RadioStreamApp {
         
         container.innerHTML = html;
       } else {
-        container.innerHTML = '<div class="loading-content"><p>No hay videocasts disponibles</p></div>';
+        container.innerHTML = '<div class="loading-content"><p>No hay videos disponibles</p></div>';
       }
     } catch (error) {
       console.error('Error loading videocasts:', error);
@@ -665,11 +665,11 @@ class RadioStreamApp {
         
         container.innerHTML = html;
       } else {
-        container.innerHTML = '<div class="loading-content"><p>No hay patrocinadores disponibles</p></div>';
+        container.innerHTML = '<div class="loading-content"><p>No hay colaboradores disponibles</p></div>';
       }
     } catch (error) {
       console.error('Error loading sponsors:', error);
-      document.getElementById('sponsors-showcase').innerHTML = '<div class="loading-content"><p>Error cargando patrocinadores</p></div>';
+      document.getElementById('sponsors-showcase').innerHTML = '<div class="loading-content"><p>Error cargando colaboradores</p></div>';
     }
   }
 
@@ -1073,9 +1073,9 @@ class RadioStreamApp {
         'programs': 'Programas',
         'news': 'Noticias',
         'podcasts': 'Podcasts',
-        'videocasts': 'Videocasts',
+        'videocasts': 'Videos',
         'videos': 'Ranking Musical',
-        'sponsors': 'Patrocinadores',
+        'sponsors': 'Colaboradores',
         'promotions': 'Anuncios',
         'social': 'Redes Sociales'
       };

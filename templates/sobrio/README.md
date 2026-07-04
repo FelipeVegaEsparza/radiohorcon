@@ -74,7 +74,7 @@ template2/
 ### 📊 Contenido Dinámico
 - Carga de programación desde API
 - Noticias con paginación
-- Multimedia (videos, podcasts, videocasts)
+- Multimedia (videos, podcasts)
 - Patrocinadores y promociones
 
 ### 🔄 Actualizaciones en Tiempo Real

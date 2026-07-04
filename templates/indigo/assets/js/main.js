@@ -797,7 +797,7 @@ class RadioNexus {
         const html = videocasts.data.map((videocast, index) => `
           <div class="media-card videocast-card glass-effect" data-aos="fade-up" data-aos-delay="${index * 50}">
             <div class="media-thumbnail">
-              ${videocast.imageUrl ? `<img src="https://dashboard.ipstream.cl${videocast.imageUrl}" alt="${videocast.title || videocast.name || 'Videocast'}">` : '<div class="default-thumbnail"><i class="fas fa-video"></i></div>'}
+              ${videocast.imageUrl ? `<img src="https://dashboard.ipstream.cl${videocast.imageUrl}" alt="${videocast.title || videocast.name || 'Video'}">` : '<div class="default-thumbnail"><i class="fas fa-video"></i></div>'}
               <div class="media-overlay">
                 <button class="play-btn glass-btn" onclick="radioNexus.openVideocastModal(${index})">
                   <i class="fas fa-play"></i>
@@ -806,8 +806,8 @@ class RadioNexus {
               <div class="media-duration">${videocast.duration || '30:00'}</div>
             </div>
             <div class="media-info">
-              <h4 class="media-title">${videocast.title || videocast.name || 'Videocast sin título'}</h4>
-              <p class="media-description">${videocast.description || 'Videocast sin descripción'}</p>
+              <h4 class="media-title">${videocast.title || videocast.name || 'Video sin título'}</h4>
+              <p class="media-description">${videocast.description || 'Video sin descripción'}</p>
               <div class="media-meta">
                 <span>${new Date(videocast.createdAt).toLocaleDateString()}</span>
                 <span><i class="fas fa-eye"></i> ${Math.floor(Math.random() * 800) + 100}</span>
@@ -846,7 +846,7 @@ class RadioNexus {
             </div>
             <div class="sponsor-info">
               <div class="sponsor-name">${sponsor.name}</div>
-              <p class="sponsor-description">${sponsor.description || 'Patrocinador oficial que confía en nosotros'}</p>
+              <p class="sponsor-description">${sponsor.description || 'Colaborador oficial que confía en nosotros'}</p>
               
               ${sponsor.address ? `
                 <div class="sponsor-contact">
@@ -1627,7 +1627,7 @@ class RadioNexus {
     const modal = document.getElementById('videocast-modal');
     
     // Populate modal content
-    document.getElementById('videocast-modal-title').textContent = videocast.title || videocast.name || 'Videocast sin título';
+    document.getElementById('videocast-modal-title').textContent = videocast.title || videocast.name || 'Video sin título';
     document.getElementById('videocast-modal-date').textContent = new Date(videocast.createdAt).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
@@ -1674,7 +1674,7 @@ class RadioNexus {
     // Set description
     const descriptionContainer = document.getElementById('videocast-modal-description');
     descriptionContainer.innerHTML = `
-      <p>${videocast.description || 'Descripción del videocast no disponible'}</p>
+      <p>${videocast.description || 'Descripción del video no disponible'}</p>
     `;
     
     // Show modal

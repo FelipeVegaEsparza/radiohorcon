@@ -803,7 +803,7 @@ class RadioPulse {
         container.innerHTML = html;
         container.classList.add('simple-grid');
       } else {
-        container.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.6); padding: 2rem;">No hay videocasts disponibles</p>';
+        container.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.6); padding: 2rem;">No hay videos disponibles</p>';
       }
     } catch (error) {
       console.error('RadioPulse: Error loading videocasts:', error);
@@ -829,7 +829,7 @@ class RadioPulse {
             </div>
             <div class="sponsor-info">
               <div class="sponsor-name">${sponsor.name}</div>
-              <p class="sponsor-description">${sponsor.description || 'Patrocinador oficial que confía en nosotros'}</p>
+              <p class="sponsor-description">${sponsor.description || 'Colaborador oficial que confía en nosotros'}</p>
               
               ${sponsor.address ? `
                 <div class="sponsor-contact">
@@ -1783,7 +1783,7 @@ class RadioPulse {
   shareVideocast() {
     if (this.currentVideocastData) {
       const url = window.location.href;
-      const text = `Mira este videocast: ${this.currentVideocastData.title}`;
+      const text = `Mira este video: ${this.currentVideocastData.title}`;
       
       if (navigator.share) {
         navigator.share({

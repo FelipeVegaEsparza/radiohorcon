@@ -194,11 +194,6 @@ class PWAInstaller {
       e.preventDefault();
       this.deferredPrompt = e;
       this.showFloatingButton();
-      
-      // Mostrar modal automáticamente después de 5 segundos
-      setTimeout(() => {
-        this.showModalAutomatically();
-      }, 5000);
     });
 
     // Event listener para cuando la app se instala
@@ -261,43 +256,6 @@ class PWAInstaller {
     setTimeout(() => {
       this.showFloatingButton();
     }, 1000);
-
-    // Para iOS: mostrar modal FORZOSAMENTE después de 3 segundos
-    // Safari no tiene beforeinstallprompt, así que siempre mostramos el modal manual
-    if (this.isIOS) {
-      console.log('PWA: iOS detected, scheduling modal in 3 seconds');
-      
-      // Intento 1: a los 3 segundos
-      setTimeout(() => {
-        console.log('PWA: Attempting to show iOS modal (attempt 1)');
-        this.showModalAutomatically();
-      }, 3000);
-      
-      // Intento 2: a los 6 segundos (fallback si el primero falla)
-      setTimeout(() => {
-        if (!this.modal || !this.modal.classList.contains('active')) {
-          console.log('PWA: Attempting to show iOS modal (attempt 2 - fallback)');
-          this.showModalAutomatically();
-        }
-      }, 6000);
-      
-      // Intento 3: a los 10 segundos (último recurso)
-      setTimeout(() => {
-        if (!this.modal || !this.modal.classList.contains('active')) {
-          console.log('PWA: Attempting to show iOS modal (attempt 3 - last resort)');
-          this.showModalAutomatically();
-        }
-      }, 10000);
-      
-    } else {
-      // Para Chrome/Edge/Android: si no llega beforeinstallprompt en 5 segundos,
-      // mostrar modal de todas formas
-      setTimeout(() => {
-        if (!this.deferredPrompt) {
-          this.showModalAutomatically();
-        }
-      }, 5000);
-    }
   }
 
   showModal() {
@@ -373,11 +331,6 @@ class PWAInstaller {
     
     this.modal.classList.remove('active');
     document.body.style.overflow = '';
-  }
-
-  showModalAutomatically() {
-    // Mostrar modal automáticamente
-    this.showModal();
   }
 
   dismissModal() {

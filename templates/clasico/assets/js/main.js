@@ -738,7 +738,7 @@ class NewsHub {
         const html = videocasts.data.map((videocast, index) => `
           <div class="media-card" data-aos="fade-up" data-aos-delay="${index * 50}">
             <div class="media-thumbnail">
-              ${videocast.imageUrl ? `<img src="https://dashboard.ipstream.cl${videocast.imageUrl}" alt="${videocast.title || videocast.name || 'Videocast'}">` : ''}
+              ${videocast.imageUrl ? `<img src="https://dashboard.ipstream.cl${videocast.imageUrl}" alt="${videocast.title || videocast.name || 'Video'}">` : ''}
               <div class="media-overlay">
                 <button class="play-btn" onclick="newsHub.openVideocastModal(${index})">
                   <i class="fas fa-play"></i>
@@ -747,8 +747,8 @@ class NewsHub {
               <div class="media-duration">${videocast.duration || '30:00'}</div>
             </div>
             <div class="media-info">
-              <h4 class="media-title">${videocast.title || videocast.name || 'Videocast sin título'}</h4>
-              <p class="media-description">${videocast.description || 'Videocast sin descripción'}</p>
+              <h4 class="media-title">${videocast.title || videocast.name || 'Video sin título'}</h4>
+              <p class="media-description">${videocast.description || 'Video sin descripción'}</p>
               <div class="media-meta">
                 <span>${new Date(videocast.createdAt).toLocaleDateString()}</span>
                 <span><i class="fas fa-eye"></i> ${Math.floor(Math.random() * 800) + 100}</span>
@@ -785,7 +785,7 @@ class NewsHub {
             </div>
             <div class="sponsor-info">
               <div class="sponsor-name">${sponsor.name}</div>
-              <p class="sponsor-description">${sponsor.description || 'Patrocinador oficial que confía en nosotros'}</p>
+              <p class="sponsor-description">${sponsor.description || 'Colaborador oficial que confía en nosotros'}</p>
               
               ${sponsor.address ? `
                 <div class="sponsor-contact">
