@@ -165,6 +165,10 @@
                 <i class="fas fa-film"></i>
                 <span>Videos</span>
               </a></li>
+              <li><a href="#" class="menu-item" data-section="galleries">
+                <i class="fas fa-images"></i>
+                <span>Galerías</span>
+              </a></li>
             </ul>
           </div>
           
@@ -405,6 +409,20 @@
           </div>
         </div>
 
+        <!-- Galleries View -->
+        <div id="galleries-view" class="content-view">
+          <div class="view-header">
+            <h1>Galerías de Imágenes</h1>
+            <p>Revive los mejores momentos en imágenes</p>
+          </div>
+          <div class="galleries-list" id="galleries-list">
+            <div class="loading-content">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span>Cargando galerías...</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Sponsors View -->
         <div id="sponsors-view" class="content-view">
           <div class="view-header">
@@ -639,6 +657,25 @@
             Ver Oferta
           </a>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gallery Lightbox Modal -->
+  <div class="gallery-lightbox" id="gallery-lightbox">
+    <button class="gallery-lightbox-close" onclick="streamApp.closeGalleryLightbox()">
+      <i class="fas fa-times"></i>
+    </button>
+    <button class="gallery-lightbox-prev" id="gallery-lightbox-prev" onclick="streamApp.prevGalleryImage()">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <button class="gallery-lightbox-next" id="gallery-lightbox-next" onclick="streamApp.nextGalleryImage()">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+    <div class="gallery-lightbox-content">
+      <img class="gallery-lightbox-image" id="gallery-lightbox-image" src="" alt="">
+      <div class="gallery-lightbox-caption">
+        <span class="gallery-lightbox-counter" id="gallery-lightbox-counter"></span>
       </div>
     </div>
   </div>

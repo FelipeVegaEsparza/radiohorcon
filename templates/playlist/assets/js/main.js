@@ -9,6 +9,7 @@ import {
   getSponsors, 
   getPromotions, 
   getSocialNetworks,
+  getGalleries,
   getCurrentSong
 } from '/assets/js/api.js';
 
@@ -103,6 +104,7 @@ class RadioStreamApp {
         this.loadVideocasts(),
         this.loadSponsors(),
         this.loadPromotions(),
+        this.loadGalleries(),
       ]);
       console.log('Template3: All content loaded successfully');
     } catch (error) {
@@ -538,15 +540,24 @@ class RadioStreamApp {
       if (e.target.classList.contains('anuncio-modal')) {
         this.closeAnuncioModal();
       }
+      if (e.target.classList.contains('gallery-lightbox')) {
+        this.closeGalleryLightbox();
+      }
     });
 
-    // Close modals with Escape key
+    // Close modals with Escape key and navigate gallery with arrows
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         this.closeNewsModal();
         this.closePodcastModal();
         this.closeVideocastModal();
         this.closeAnuncioModal();
+        this.closeGalleryLightbox();
+      }
+      const lightbox = document.getElementById('gallery-lightbox');
+      if (lightbox && lightbox.classList.contains('active')) {
+        if (e.key === 'ArrowRight') this.nextGalleryImage();
+        if (e.key === 'ArrowLeft') this.prevGalleryImage();
       }
     });
   }
@@ -755,6 +766,146 @@ class RadioStreamApp {
     } catch (error) {
       console.error('Error loading social networks:', error);
     }
+  }
+
+  async loadGalleries() {
+    try {
+      const galleries = await getGalleries();
+      const container = document.getElementById('galleries-list');
+
+      if (!container) {
+        console.error('Galleries container not found');
+        return;
+      }
+
+      if (galleries && galleries.length > 0) {
+        const html = galleries.map((gallery, gIndex) => {
+          const images = Array.isArray(gallery.images)
+            ? [...gallery.images].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            : [];
+
+          const thumbs = images.map((img, iIndex) => `
+            <div class="gallery-thumb" data-gallery="${gIndex}" data-index="${iIndex}">
+              <img src="https://dashboard.ipstream.cl${img.imageUrl}" alt="${gallery.title}" loading="lazy">
+              <div class="gallery-thumb-overlay">
+                <i class="fas fa-search-plus"></i>
+              </div>
+            </div>
+          `).join('');
+
+          return `
+            <div class="gallery-item">
+              <div class="gallery-header">
+                <h2 class="gallery-title">
+                  <i class="fas fa-images"></i>
+                  ${gallery.title}
+                </h2>
+                ${gallery.description ? `<p class="gallery-description">${gallery.description}</p>` : ''}
+                <span class="gallery-image-count">
+                  <i class="fas fa-image"></i> ${images.length} ${images.length === 1 ? 'imagen' : 'imágenes'}
+                </span>
+              </div>
+              <div class="gallery-grid">
+                ${thumbs}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        container.innerHTML = html;
+
+        this.galleriesData = galleries;
+
+        container.querySelectorAll('.gallery-thumb').forEach(thumb => {
+          thumb.addEventListener('click', () => {
+            const gIndex = parseInt(thumb.dataset.gallery, 10);
+            const iIndex = parseInt(thumb.dataset.index, 10);
+            this.openGalleryLightbox(gIndex, iIndex);
+          });
+        });
+      } else {
+        container.innerHTML = `
+          <div class="gallery-empty">
+            <i class="fas fa-images"></i>
+            <p>No hay galerías disponibles</p>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Error loading galleries:', error);
+      const container = document.getElementById('galleries-list');
+      if (container) {
+        container.innerHTML = `
+          <div class="gallery-empty">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Error cargando galerías</p>
+          </div>
+        `;
+      }
+    }
+  }
+
+  openGalleryLightbox(galleryIndex, imageIndex) {
+    if (!this.galleriesData || !this.galleriesData[galleryIndex]) return;
+
+    const gallery = this.galleriesData[galleryIndex];
+    this.currentGalleryImages = [...(gallery.images || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    this.currentGalleryIndex = imageIndex;
+    this.currentGalleryTitle = gallery.title;
+
+    this.renderGalleryLightbox();
+    const modal = document.getElementById('gallery-lightbox');
+    if (modal) {
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  renderGalleryLightbox() {
+    if (!this.currentGalleryImages || this.currentGalleryImages.length === 0) return;
+
+    const imgEl = document.getElementById('gallery-lightbox-image');
+    const counterEl = document.getElementById('gallery-lightbox-counter');
+    const prevBtn = document.getElementById('gallery-lightbox-prev');
+    const nextBtn = document.getElementById('gallery-lightbox-next');
+
+    const img = this.currentGalleryImages[this.currentGalleryIndex];
+    if (imgEl && img) {
+      imgEl.src = `https://dashboard.ipstream.cl${img.imageUrl}`;
+      imgEl.alt = this.currentGalleryTitle || '';
+    }
+    if (counterEl) {
+      counterEl.textContent = `${this.currentGalleryIndex + 1} / ${this.currentGalleryImages.length}`;
+    }
+
+    const total = this.currentGalleryImages.length;
+    if (prevBtn) prevBtn.style.display = total > 1 ? 'flex' : 'none';
+    if (nextBtn) nextBtn.style.display = total > 1 ? 'flex' : 'none';
+  }
+
+  closeGalleryLightbox() {
+    const modal = document.getElementById('gallery-lightbox');
+    if (modal) {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+      const imgEl = document.getElementById('gallery-lightbox-image');
+      if (imgEl) imgEl.src = '';
+      this.currentGalleryImages = null;
+      this.currentGalleryIndex = 0;
+      this.currentGalleryTitle = null;
+    }
+  }
+
+  nextGalleryImage() {
+    if (!this.currentGalleryImages || this.currentGalleryImages.length < 2) return;
+    this.currentGalleryIndex = (this.currentGalleryIndex + 1) % this.currentGalleryImages.length;
+    this.renderGalleryLightbox();
+  }
+
+  prevGalleryImage() {
+    if (!this.currentGalleryImages || this.currentGalleryImages.length < 2) return;
+    this.currentGalleryIndex = (this.currentGalleryIndex - 1 + this.currentGalleryImages.length) % this.currentGalleryImages.length;
+    this.renderGalleryLightbox();
   }
 
   async loadSonicPanelData() {
@@ -1004,6 +1155,9 @@ class RadioStreamApp {
         case 'social':
           await this.loadSocialNetworks();
           break;
+        case 'galleries':
+          await this.loadGalleries();
+          break;
         default:
           console.log('Template3: No specific content loader for:', section);
       }
@@ -1077,7 +1231,8 @@ class RadioStreamApp {
         'videos': 'Ranking Musical',
         'sponsors': 'Colaboradores',
         'promotions': 'Anuncios',
-        'social': 'Redes Sociales'
+        'social': 'Redes Sociales',
+        'galleries': 'Galerías'
       };
       breadcrumb.textContent = titles[viewName] || 'Radio Stream';
     }

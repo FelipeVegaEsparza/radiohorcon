@@ -13,6 +13,7 @@ const CACHE_TTL = {
   promotions: 30 * 60 * 1000, // 30 minutos
   social: 60 * 60 * 1000,     // 1 hora
   sonic: 30 * 1000,           // 30 segundos
+  galleries: 30 * 60 * 1000,  // 30 minutos
   default: 10 * 60 * 1000     // 10 minutos default
 };
 
@@ -267,6 +268,11 @@ export async function getVideocastById(id) {
 export async function getSocialNetworks() {
   const base = await getApiBase();
   return fetchJSON(`${base}/social-networks`, { cacheTTL: CACHE_TTL.social });
+}
+
+export async function getGalleries() {
+  const base = await getApiBase();
+  return fetchJSON(`${base}/galleries`, { cacheTTL: CACHE_TTL.galleries });
 }
 
 export async function buildImageUrl(path) {
