@@ -418,19 +418,29 @@ class RadioStreamApp {
     // Setup video player
     const videoContainer = document.getElementById('videocast-container');
     if (videocast.videoUrl) {
-      // Check if it's a YouTube URL
-      if (videocast.videoUrl.includes('youtube.com') || videocast.videoUrl.includes('youtu.be')) {
-        const videoId = this.extractYouTubeId(videocast.videoUrl);
+      const embedInfo = this.getEmbedInfo(videocast.videoUrl);
+
+      if (embedInfo) {
         videoContainer.innerHTML = `
-          <iframe width="100%" height="400" 
-                  src="https://www.youtube.com/embed/${videoId}" 
-                  frameborder="0" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                  allowfullscreen>
-          </iframe>
+          <div style="width: 100%;">
+            <iframe width="100%" height="400"
+                    src="${embedInfo.embedUrl}"
+                    title="${videocast.title}"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    style="border-radius: 8px;">
+            </iframe>
+            <div style="text-align: center; margin-top: 0.75rem;">
+              <a href="${embedInfo.watchUrl}" target="_blank" rel="noopener noreferrer"
+                 style="color: #1db954; text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                <i class="fas fa-external-link-alt"></i> Abrir en ${embedInfo.platform}
+              </a>
+            </div>
+          </div>
         `;
       } else {
-        // For other video URLs, use video element
+        // For direct video URLs
         videoContainer.innerHTML = `
           <video controls style="width: 100%; height: 400px; border-radius: 8px;">
             <source src="${videocast.videoUrl}" type="video/mp4">
@@ -439,7 +449,7 @@ class RadioStreamApp {
         `;
       }
     } else {
-      videoContainer.innerHTML = '<p>No hay video disponible</p>';
+      videoContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--text-secondary);">No hay video disponible</p>';
     }
 
     // Show modal
@@ -447,10 +457,43 @@ class RadioStreamApp {
     document.body.style.overflow = 'hidden';
   }
 
-  extractYouTubeId(url) {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
+  getEmbedInfo(videoUrl) {
+    if (!videoUrl) return null;
+
+    // YouTube
+    const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+    const youtubeMatch = videoUrl.match(youtubeRegex);
+    if (youtubeMatch) {
+      const id = youtubeMatch[1];
+      return {
+        embedUrl: `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`,
+        watchUrl: `https://www.youtube.com/watch?v=${id}`,
+        platform: 'YouTube'
+      };
+    }
+
+    // Vimeo
+    const vimeoRegex = /(?:vimeo\.com\/)([0-9]+)/;
+    const vimeoMatch = videoUrl.match(vimeoRegex);
+    if (vimeoMatch) {
+      const id = vimeoMatch[1];
+      return {
+        embedUrl: `https://player.vimeo.com/video/${id}?autoplay=1`,
+        watchUrl: `https://vimeo.com/${id}`,
+        platform: 'Vimeo'
+      };
+    }
+
+    // Already an embed URL
+    if (videoUrl.includes('embed') || videoUrl.includes('player')) {
+      return {
+        embedUrl: videoUrl,
+        watchUrl: videoUrl,
+        platform: 'sitio externo'
+      };
+    }
+
+    return null;
   }
 
   closePodcastModal() {
