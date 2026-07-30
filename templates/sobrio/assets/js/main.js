@@ -743,7 +743,6 @@ class RadioLanding {
   updateHeroPlayer(songData) {
     // Update cover info
     document.getElementById('hero-song-title').textContent = songData.title;
-    document.getElementById('hero-song-listeners').textContent = `${songData.listeners} oyentes`;
     
     // Update cover image
     const coverImg = document.getElementById('hero-cover-image');
@@ -812,9 +811,6 @@ class RadioLanding {
         if (!this.currentSongData || this.currentSongData.title !== songData.title || this.currentSongData.art !== songData.art) {
           this.currentSongData = songData;
           this.updateHeroPlayer(songData);
-        } else {
-          // Just update listener count in cover
-          document.getElementById('hero-song-listeners').textContent = `${songData.listeners} oyentes`;
         }
       } catch (error) {
         console.error('Error updating SonicPanel data:', error);

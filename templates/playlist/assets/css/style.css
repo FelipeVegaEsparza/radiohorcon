@@ -254,19 +254,6 @@ body {
   50% { opacity: 0.5; }
 }
 
-.listener-count {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: rgba(29, 185, 84, 0.2);
-  border: 1px solid #1db954;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #1db954;
-}
-
 /* Content Container */
 .content-container {
   flex: 1;
@@ -2342,11 +2329,6 @@ body {
     font-size: 0.8rem;
   }
   
-  /* Ocultar contador de oyentes en móvil */
-  .listener-count {
-    display: none !important;
-  }
-  
   /* Ocultar botón flotante de PWA en móvil */
   .pwa-floating-button {
     display: none !important;
@@ -2540,11 +2522,6 @@ body {
   .live-indicator {
     padding: 0.4rem;
     min-width: auto;
-  }
-  
-  /* Ocultar completamente el contador de oyentes */
-  .listener-count {
-    display: none !important;
   }
   
   /* Ocultar botón flotante de PWA */

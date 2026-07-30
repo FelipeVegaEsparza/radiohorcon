@@ -964,10 +964,7 @@ class RadioNexus {
   updateCurrentSongDisplay(songData) {
     document.getElementById('player-song-title').textContent = songData.title || 'Radio Nexus';
     document.getElementById('player-song-artist').textContent = songData.artist || 'En Vivo';
-    document.getElementById('player-listeners').textContent = songData.listeners || '0';
     document.getElementById('player-bitrate').textContent = songData.bitrate || 'N/A';
-    
-    document.getElementById('footer-listeners').textContent = songData.listeners || '0';
     
     const playerArtwork = document.getElementById('player-artwork');
     const defaultArtwork = document.querySelector('.default-artwork');
@@ -989,7 +986,6 @@ class RadioNexus {
   }
 
   updateStats(songData) {
-    document.getElementById('sidebar-listeners').textContent = songData.listeners || '0';
     document.getElementById('sidebar-songs').textContent = Math.floor(Math.random() * 50) + 20;
     document.getElementById('sidebar-quality').textContent = songData.bitrate ? `${songData.bitrate}k` : 'HD';
   }

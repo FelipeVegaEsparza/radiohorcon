@@ -404,15 +404,6 @@ body {
   }
 }
 
-.listeners-count {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.9rem;
-  font-family: 'JetBrains Mono', monospace;
-}
-
 /* Player Controls */
 .player-controls {
   display: flex;

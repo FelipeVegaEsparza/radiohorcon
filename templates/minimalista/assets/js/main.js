@@ -178,7 +178,6 @@ class RadioPulsePlayer {
   updateCurrentSongDisplay(songData) {
     document.getElementById('track-title').textContent = songData.title || 'Radio Pulse';
     document.getElementById('track-artist').textContent = songData.artist || 'En Vivo';
-    document.getElementById('listeners-count').textContent = songData.listeners || '0';
     document.getElementById('audio-quality').textContent = songData.bitrate ? `${songData.bitrate}k` : 'HD';
     document.getElementById('bitrate').textContent = songData.bitrate || 'N/A';
     

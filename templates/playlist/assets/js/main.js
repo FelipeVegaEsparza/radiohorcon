@@ -931,20 +931,11 @@ class RadioStreamApp {
     // Update main display
     document.getElementById('main-song-title').textContent = songData.title;
     document.getElementById('main-song-artist').textContent = 'Radio Stream';
-    document.getElementById('main-listeners').innerHTML = `<i class="fas fa-users"></i> ${songData.listeners} oyentes`;
     document.getElementById('main-bitrate').innerHTML = `<i class="fas fa-signal"></i> ${songData.bitrate} kbps`;
     
     // Update top bar (if exists)
-    const listenerCountEl = document.getElementById('listener-count');
-    if (listenerCountEl) {
-      listenerCountEl.textContent = songData.listeners;
-    }
     
     // Update bottom player stats
-    const playerListenerCount = document.getElementById('player-listener-count');
-    if (playerListenerCount) {
-      playerListenerCount.textContent = songData.listeners;
-    }
     
     const playerBitrateValue = document.getElementById('player-bitrate-value');
     if (playerBitrateValue) {
@@ -993,17 +984,6 @@ class RadioStreamApp {
         if (!this.currentSongData || this.currentSongData.title !== songData.title) {
           this.currentSongData = songData;
           this.updateNowPlaying(songData);
-        } else {
-          // Just update listener count
-          document.getElementById('main-listeners').innerHTML = `<i class="fas fa-users"></i> ${songData.listeners} oyentes`;
-          const listenerCountEl = document.getElementById('listener-count');
-          if (listenerCountEl) {
-            listenerCountEl.textContent = songData.listeners;
-          }
-          const playerListenerCount = document.getElementById('player-listener-count');
-          if (playerListenerCount) {
-            playerListenerCount.textContent = songData.listeners;
-          }
         }
       } catch (error) {
         console.error('Error updating SonicPanel data:', error);

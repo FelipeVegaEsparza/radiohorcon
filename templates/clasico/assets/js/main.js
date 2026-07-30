@@ -918,11 +918,9 @@ class NewsHub {
     // Update player
     document.getElementById('player-song-title').textContent = songData.title || 'Radio News Hub';
     document.getElementById('player-song-artist').textContent = songData.artist || 'En Vivo';
-    document.getElementById('player-listeners').textContent = songData.listeners || '0';
     document.getElementById('player-bitrate').textContent = songData.bitrate || 'N/A';
     
     // Update footer
-    document.getElementById('footer-listeners').textContent = songData.listeners || '0';
     
     // Update artwork if available
     if (songData.art) {
@@ -936,7 +934,6 @@ class NewsHub {
 
   updateStats(songData) {
     // Update sidebar stats
-    document.getElementById('sidebar-listeners').textContent = songData.listeners || '0';
     document.getElementById('sidebar-songs').textContent = Math.floor(Math.random() * 50) + 20;
     document.getElementById('sidebar-quality').textContent = songData.bitrate ? `${songData.bitrate}k` : 'HD';
   }
