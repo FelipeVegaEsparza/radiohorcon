@@ -1160,6 +1160,38 @@ body {
   border-radius: 8px;
 }
 
+.videocast-player-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #1a1a1a;
+}
+
+.videocast-player-wrapper iframe,
+.videocast-player-wrapper video {
+  position: relative;
+  z-index: 2;
+  display: block;
+  background: transparent;
+}
+
+.videocast-cover-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.videocast-cover-fallback.active {
+  display: flex;
+}
+
 .videocast-description {
   margin-bottom: 1.5rem;
 }

@@ -417,20 +417,31 @@ class RadioStreamApp {
 
     // Setup video player
     const videoContainer = document.getElementById('videocast-container');
+    const coverUrl = videocast.imageUrl ? `https://dashboard.ipstream.cl${videocast.imageUrl}` : '';
+    const coverStyle = coverUrl
+      ? `background-image: url('${coverUrl}'); background-size: cover; background-position: center;`
+      : `background-color: #1a1a1a;`;
     if (videocast.videoUrl) {
       const embedInfo = this.getEmbedInfo(videocast.videoUrl);
 
       if (embedInfo) {
         videoContainer.innerHTML = `
           <div style="width: 100%;">
-            <iframe width="100%" height="400"
-                    src="${embedInfo.embedUrl}"
-                    title="${videocast.title}"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen
-                    style="border-radius: 8px;">
-            </iframe>
+            <div class="videocast-player-wrapper" style="${coverStyle}">
+              <iframe width="100%" height="400"
+                      src="${embedInfo.embedUrl}"
+                      title="${videocast.title}"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen>
+              </iframe>
+              <div class="videocast-cover-fallback" style="background-image: url('${coverUrl}');">
+                <a href="${embedInfo.watchUrl}" target="_blank" rel="noopener noreferrer"
+                   style="color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: rgba(0,0,0,0.6); border-radius: 999px; backdrop-filter: blur(4px);">
+                  <i class="fas fa-external-link-alt"></i> Ver video en ${embedInfo.platform}
+                </a>
+              </div>
+            </div>
             <div style="text-align: center; margin-top: 0.75rem;">
               <a href="${embedInfo.watchUrl}" target="_blank" rel="noopener noreferrer"
                  style="color: #1db954; text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.4rem;">
@@ -439,14 +450,48 @@ class RadioStreamApp {
             </div>
           </div>
         `;
+
+        // Si el iframe no carga en 4s o falla, mostrar el cover
+        const wrapper = videoContainer.querySelector('.videocast-player-wrapper');
+        const fallback = videoContainer.querySelector('.videocast-cover-fallback');
+        const iframe = videoContainer.querySelector('iframe');
+        if (iframe && fallback) {
+          let activated = false;
+          const showFallback = () => {
+            if (activated) return;
+            activated = true;
+            fallback.classList.add('active');
+          };
+          iframe.addEventListener('error', showFallback);
+          setTimeout(() => {
+            try {
+              const doc = iframe.contentDocument || iframe.contentWindow?.document;
+              if (!doc || !doc.body || doc.body.innerHTML.trim() === '') showFallback();
+            } catch (e) { /* cross-origin, no se puede leer */ }
+          }, 4000);
+        }
       } else {
         // For direct video URLs
         videoContainer.innerHTML = `
-          <video controls style="width: 100%; height: 400px; border-radius: 8px;">
-            <source src="${videocast.videoUrl}" type="video/mp4">
-            Tu navegador no soporta el elemento video.
-          </video>
+          <div class="videocast-player-wrapper" style="${coverStyle}">
+            <video controls style="width: 100%; height: 400px;">
+              <source src="${videocast.videoUrl}" type="video/mp4">
+              Tu navegador no soporta el elemento video.
+            </video>
+            <div class="videocast-cover-fallback" style="background-image: url('${coverUrl}');">
+              <a href="${videocast.videoUrl}" target="_blank" rel="noopener noreferrer"
+                 style="color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: rgba(0,0,0,0.6); border-radius: 999px; backdrop-filter: blur(4px);">
+                <i class="fas fa-external-link-alt"></i> Abrir video
+              </a>
+            </div>
+          </div>
         `;
+
+        const videoEl = videoContainer.querySelector('video');
+        const fallback = videoContainer.querySelector('.videocast-cover-fallback');
+        if (videoEl && fallback) {
+          videoEl.addEventListener('error', () => fallback.classList.add('active'));
+        }
       }
     } else {
       videoContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--text-secondary);">No hay video disponible</p>';
